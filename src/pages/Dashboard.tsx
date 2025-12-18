@@ -1,89 +1,254 @@
+// ✅ PREMIUM DASHBOARD - Hospital Command Center
+// Enhanced with animations, gradients, and professional data visualization
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import KPICard from '@/components/KPICard';
-import { mockWards, dailyExposureData, mockAlerts } from '@/data/mockData';
-import { Activity, Users, AlertTriangle, Clock, TrendingUp } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { mockWards, dailyExposureData, mockAlerts, pathogenDistribution } from '@/data/mockData';
+import { 
+  Activity, 
+  Users, 
+  AlertTriangle, 
+  Clock, 
+  TrendingUp,
+  TrendingDown,
+  Shield,
+  Droplets,
+  Target
+} from 'lucide-react';
+import { 
+  LineChart, 
+  Line, 
+  AreaChart,
+  Area,
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend
+} from 'recharts';
 
 const Dashboard = () => {
   const totalActiveAlerts = mockAlerts.filter(a => a.status === 'new').length;
   const criticalAlerts = mockAlerts.filter(a => a.severity === 'critical').length;
   const avgDetectionTime = 2.3;
+  const totalPatients = 15;
+  const mdrPositive = 6;
 
   const getRiskColor = (level: string) => {
     switch (level) {
-      case 'high': return 'bg-destructive/10 text-destructive border-destructive/20';
-      case 'medium': return 'bg-warning/10 text-warning border-warning/20';
-      case 'low': return 'bg-success/10 text-success border-success/20';
+      case 'critical': return 'bg-red-100 text-red-700 border-red-300 dark:bg-red-950/30 dark:text-red-400 dark:border-red-800';
+      case 'high': return 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-950/30 dark:text-orange-400 dark:border-orange-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-950/30 dark:text-yellow-400 dark:border-yellow-800';
+      case 'low': return 'bg-green-100 text-green-700 border-green-300 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800';
       default: return 'bg-muted';
+    }
+  };
+
+  const getWardGradient = (level: string) => {
+    switch (level) {
+      case 'critical': return 'from-red-100 to-red-50 dark:from-red-950/40 dark:to-red-900/20 border-red-300 dark:border-red-800';
+      case 'high': return 'from-orange-100 to-orange-50 dark:from-orange-950/40 dark:to-orange-900/20 border-orange-300 dark:border-orange-800';
+      case 'medium': return 'from-yellow-100 to-yellow-50 dark:from-yellow-950/40 dark:to-yellow-900/20 border-yellow-300 dark:border-yellow-800';
+      case 'low': return 'from-green-100 to-green-50 dark:from-green-950/40 dark:to-green-900/20 border-green-300 dark:border-green-800';
+      default: return 'from-gray-100 to-gray-50';
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Overview Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Real-time monitoring of MDR pathogens and contact tracing</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+            Surveillance Dashboard
+          </h1>
+          <p className="text-muted-foreground mt-1">Real-time MDR pathogen monitoring and contact tracing intelligence</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="border-green-500 text-green-600 px-3 py-1">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2" />
+            System Active
+          </Badge>
+          <Button variant="outline" size="sm">
+            <Shield className="w-4 h-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards with Enhanced Styling */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title="Active MDR Cases"
-          value={criticalAlerts}
-          change="+2 last 24h"
-          changeType="negative"
-          icon={Activity}
-        />
-        <KPICard
-          title="Suspected Chains"
-          value="8"
-          change="3 resolved today"
-          changeType="positive"
-          icon={Users}
-        />
-        <KPICard
-          title="Unacknowledged Alerts"
-          value={totalActiveAlerts}
-          change="Requires attention"
-          changeType="negative"
-          icon={AlertTriangle}
-          iconColor="bg-destructive/10"
-        />
-        <KPICard
-          title="Avg. Detection Time"
-          value={`${avgDetectionTime}h`}
-          change="-0.8h vs last week"
-          changeType="positive"
-          icon={Clock}
-        />
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20 border-red-200 dark:border-red-800 hover:shadow-xl transition-all duration-300 group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-red-500 rounded-xl shadow-lg shadow-red-500/30 group-hover:scale-110 transition-transform">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <TrendingUp className="w-5 h-5 text-red-600" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-red-900 dark:text-red-100">{criticalAlerts}</p>
+              <p className="text-sm text-red-700 dark:text-red-300 font-medium mb-2">Active MDR Cases</p>
+              <Badge variant="outline" className="border-red-300 text-red-600 text-xs">
+                +2 last 24h
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/20 dark:to-orange-900/20 border-orange-200 dark:border-orange-800 hover:shadow-xl transition-all duration-300 group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-orange-500 rounded-xl shadow-lg shadow-orange-500/30 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <TrendingDown className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-orange-900 dark:text-orange-100">8</p>
+              <p className="text-sm text-orange-700 dark:text-orange-300 font-medium mb-2">Transmission Chains</p>
+              <Badge variant="outline" className="border-green-300 text-green-600 text-xs">
+                3 resolved today
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/20 dark:to-yellow-900/20 border-yellow-200 dark:border-yellow-800 hover:shadow-xl transition-all duration-300 group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-yellow-500 rounded-xl shadow-lg shadow-yellow-500/30 group-hover:scale-110 transition-transform animate-pulse">
+                <AlertTriangle className="w-6 h-6 text-white" />
+              </div>
+              <Target className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-yellow-900 dark:text-yellow-100">{totalActiveAlerts}</p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 font-medium mb-2">Pending Alerts</p>
+              <Badge variant="outline" className="border-yellow-300 text-yellow-600 text-xs">
+                Requires attention
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800 hover:shadow-xl transition-all duration-300 group">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="p-3 bg-blue-500 rounded-xl shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+              <TrendingDown className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{avgDetectionTime}h</p>
+              <p className="text-sm text-blue-700 dark:text-blue-300 font-medium mb-2">Avg Detection Time</p>
+              <Badge variant="outline" className="border-green-300 text-green-600 text-xs">
+                -0.8h vs last week
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Row */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        {/* Exposure Trend Chart */}
-        <Card>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Exposure Trend Chart - Enhanced */}
+        <Card className="lg:col-span-2 hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-primary" />
-              Daily Suspected Exposures
+              Outbreak Progression Timeline
             </CardTitle>
-            <CardDescription>Contact events flagged for review (last 15 days)</CardDescription>
+            <CardDescription>Daily exposure events and new case detection (last 15 days)</CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <LineChart data={dailyExposureData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={dailyExposureData}>
+                <defs>
+                  <linearGradient id="colorExposures" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                  </linearGradient>
+                  <linearGradient id="colorCases" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                 <XAxis 
                   dataKey="date" 
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={11}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <YAxis 
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={11}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="exposures" 
+                  stroke="#3B82F6" 
+                  strokeWidth={2}
+                  fill="url(#colorExposures)"
+                  name="Exposures"
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="newCases" 
+                  stroke="#EF4444" 
+                  strokeWidth={2}
+                  fill="url(#colorCases)"
+                  name="New Cases"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Pathogen Distribution Pie Chart - NEW */}
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Droplets className="w-5 h-5 text-primary" />
+              Pathogen Distribution
+            </CardTitle>
+            <CardDescription>Current MDR organism prevalence</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={pathogenDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  labelLine={false}
+                >
+                  {pathogenDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
@@ -91,50 +256,64 @@ const Dashboard = () => {
                     borderRadius: '8px'
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="exposures" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))' }}
-                />
-              </LineChart>
+              </PieChart>
             </ResponsiveContainer>
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              {pathogenDistribution.map((pathogen) => (
+                <div key={pathogen.name} className="flex items-center gap-2">
+                  <div 
+                    className="w-3 h-3 rounded-full" 
+                    style={{ backgroundColor: pathogen.color }}
+                  />
+                  <span className="text-xs text-muted-foreground">{pathogen.name}</span>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Ward Status */}
-        <Card>
+      {/* Ward Status - Enhanced */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle>Ward Risk Status</CardTitle>
-            <CardDescription>Current occupancy and risk levels by ward</CardDescription>
+            <CardDescription>Real-time occupancy and risk monitoring</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {mockWards.map((ward) => (
-                <div key={ward.id} className="space-y-2">
+                <div key={ward.id} className="space-y-2 group">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Badge variant="outline" className={getRiskColor(ward.riskLevel)}>
+                      <Badge variant="outline" className={`${getRiskColor(ward.riskLevel)} font-semibold`}>
                         {ward.riskLevel.toUpperCase()}
                       </Badge>
                       <div>
-                        <p className="font-medium text-foreground">{ward.name}</p>
+                        <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                          {ward.name}
+                        </p>
                         <p className="text-xs text-muted-foreground">Floor {ward.floor}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground">
+                      <p className="text-sm font-bold text-foreground">
                         {ward.currentOccupancy}/{ward.capacity}
                       </p>
                       {ward.activeAlerts > 0 && (
-                        <p className="text-xs text-destructive">{ward.activeAlerts} alerts</p>
+                        <Badge variant="destructive" className="text-xs mt-1">
+                          {ward.activeAlerts} alert{ward.activeAlerts > 1 ? 's' : ''}
+                        </Badge>
                       )}
                     </div>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-primary transition-all"
+                      className={`h-full transition-all duration-500 ${
+                        ward.riskLevel === 'critical' ? 'bg-red-500' :
+                        ward.riskLevel === 'high' ? 'bg-orange-500' :
+                        ward.riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}
                       style={{ width: `${(ward.currentOccupancy / ward.capacity) * 100}%` }}
                     />
                   </div>
@@ -143,37 +322,79 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Quick Stats Card - NEW */}
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <CardTitle>System Performance</CardTitle>
+            <CardDescription>Outbreak control effectiveness metrics</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+              <div>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{mdrPositive}/{totalPatients}</p>
+                <p className="text-sm text-blue-700 dark:text-blue-300">MDR Positive Rate</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-semibold text-blue-600">{Math.round((mdrPositive/totalPatients)*100)}%</p>
+                <p className="text-xs text-blue-500">of monitored</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-100">94%</p>
+                <p className="text-sm text-green-700 dark:text-green-300">Isolation Compliance</p>
+              </div>
+              <Shield className="w-8 h-8 text-green-500" />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+              <div>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">156</p>
+                <p className="text-sm text-purple-700 dark:text-purple-300">Contacts Traced</p>
+              </div>
+              <Users className="w-8 h-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Ward Heatmap */}
-      <Card>
+      {/* Ward Heatmap - PREMIUM VERSION */}
+      <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
-          <CardTitle>Ward Heatmap - Risk Distribution</CardTitle>
-          <CardDescription>Visual representation of pathogen risk across hospital wards</CardDescription>
+          <CardTitle>Hospital Risk Heatmap</CardTitle>
+          <CardDescription>Visual representation of MDR risk distribution across wards</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {mockWards.map((ward) => (
               <div
                 key={ward.id}
-                className={`p-6 rounded-lg border-2 cursor-pointer transition-all hover:scale-105 ${
-                  ward.riskLevel === 'high'
-                    ? 'bg-destructive/10 border-destructive/30 hover:border-destructive'
-                    : ward.riskLevel === 'medium'
-                    ? 'bg-warning/10 border-warning/30 hover:border-warning'
-                    : 'bg-success/10 border-success/30 hover:border-success'
-                }`}
+                className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl bg-gradient-to-br ${getWardGradient(ward.riskLevel)}`}
               >
-                <h3 className="font-bold text-foreground mb-1">{ward.name}</h3>
-                <p className="text-xs text-muted-foreground mb-3">Floor {ward.floor}</p>
-                <div className="space-y-1">
-                  <p className="text-sm">
-                    <span className="font-medium">Occupancy:</span> {ward.currentOccupancy}/{ward.capacity}
-                  </p>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-foreground text-lg">{ward.name}</h3>
                   {ward.activeAlerts > 0 && (
-                    <p className="text-sm font-semibold text-destructive">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mb-4">Floor {ward.floor}</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Occupancy</span>
+                    <span className="font-bold text-foreground">{ward.currentOccupancy}/{ward.capacity}</span>
+                  </div>
+                  <div className="h-2 bg-white/50 dark:bg-black/20 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-foreground/60 transition-all"
+                      style={{ width: `${(ward.currentOccupancy / ward.capacity) * 100}%` }}
+                    />
+                  </div>
+                  {ward.activeAlerts > 0 && (
+                    <Badge variant="destructive" className="w-full justify-center text-xs mt-2">
                       ⚠️ {ward.activeAlerts} Active Alert{ward.activeAlerts > 1 ? 's' : ''}
-                    </p>
+                    </Badge>
                   )}
                 </div>
               </div>
